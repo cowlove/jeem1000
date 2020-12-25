@@ -1,0 +1,6 @@
+DONE * Make record button blink in a way more visible manner when recording
+DONE * Add "epoch" time to .log.out file
+DONE * do a system(sync) call when closing log files
+
+DONE * Open a pipeline to festival rather than calling it every time
+

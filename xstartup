@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Copy me to ~/.vnc/xstartup on efis machine
+#
+xsetroot -solid grey
+
+xrdb $HOME/.Xresources
+if [ "$DISPLAY" == ":2" ]; then
+	x-terminal-emulator -e script ${HOME}/typescript -a -c ${HOME}/workspace/jeem1000/wifi.sh & 
+	export XKL_XMODMAP_DISABLE=1
+	/etc/X11/Xsession
+
+fi
+

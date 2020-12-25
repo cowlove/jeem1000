@@ -1,0 +1,73 @@
+sudo apt-get update
+sudo apt-get install -y tightvncserver openssh-server git sox cvs libusb-dev i2c-tools android-tools-adb ppp lsof 
+sudo apt-get install -y jstest-gtk gedit pi-bluetooth bluez
+sudo apt-get install -y git git-core cmake libusb-1.0-0-dev build-essential
+sudo apt-get upgrade -y 
+
+#setup network/interfaces and wpa_supplicant to work with drivers
+#ubuntu ALL=NOPASSWD: ALL to sudoers file
+copy rc.local to launch xtighvncserver
+copy xstartup to ~/.vnc/xstartup to launch xterm & adb.sh
+#set force_color_prompt in .bashrc
+sudo adduser ubuntu i2c
+
+
+#enable i2c and cli boot with raspi-config
+mkdir ~/log
+mkdir ~/adc-conf; cd ~/adc-conf && mkfifo tty.{gps,efis,imu,adc}
+
+#Copy map tifs to ~/adc-conf
+scp ~/adc-conf/*.tif adc:adc-conf/
+
+Increase swap: vi /etc/dphys-swapfile 
+
+install rtl-sdr/dump1090 like http://www.satsignal.eu/raspberry-pi/dump1090.html
+sudo apt-get install git git-core cmake libusb-1.0-0-dev build-essential
+
+# i2c 
+mkdir ~/src && cd ~/src
+cvs -d jim@hanjin:/home/jim/cvsroot checkout i2cSerialMux 
+cd i2cSerialMux
+make
+cp i2c ~/bin
+
+git clone https://github.com/PaulStoffregen/teensy_loader_cli.git
+
+#dump978:
+ git clone https://github.com/mutability/dump978.git
+ cd dump978/
+ make && cp uat2text dump978 ~/bin
+
+#rtl-sdr:
+cd ~/src
+git clone git://git.osmocom.org/rtl-sdr.git
+cd rtl-sdr
+mkdir build
+cd build
+cmake ../ -DINSTALL_UDEV_RULES=ON
+make
+sudo make install
+sudo ldconfig
+
+echo blacklist dvb_usb_rtl28xxu >> /etc/modprobe.d/raspi-blacklist.conf
+ 
+
+#test rtl : 
+rtl_fm -f 127.75M -M am | play -t raw -r 24k -es -b 16 -c 1 -V1 -
+
+#install festival stuff     per http://ubuntuforums.org/showthread.php?t=677277
+
+
+#.asoundrc with default.card etc lines
+printf "defaults.pcm.card 1\ndefaults.pcm.device 0\ndefaults.ctl.card 1\n" > .asoundrc 
+
+#teensy-cli-loader 
+git clone https://github.com/PaulStoffregen/teensy_loader_cli.git
+sudo ~/teensy_loader_cli/teensy_loader_cli --mcu=mk20dx256 -v -s  ~/adcTeensyFirmware.hex 
+
+#.ssh setup
+# Make sure passcode-less id file is specified for Host vheavy.com 
+
+# Remove serial console login from /boot/cmdline.txt
+
+# Setup SSHD on android viewer tablet per http://wiki.cyanogenmod.org/w/Doc:_sshd
